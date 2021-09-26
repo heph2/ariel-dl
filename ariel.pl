@@ -51,7 +51,7 @@ say for @links;
 ## Adding signal handler for INT( Ctrl-C on the keyboard ), and
 ## for TERM, that cause Perl to exit cleanly
 ## If fork fails, parent send a TERM to all child process and then exit
-$SIG{INT} = $SIG{TERM} = sub { exit };
+#$SIG{INT} = $SIG{TERM} = sub { exit };
 
 
 my $parent_pid = "$$";
