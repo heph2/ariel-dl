@@ -115,27 +115,25 @@ chomp $download_link;
 ## 1-4  (Download from 1 to 4)
 ## 1,4 (Download 1 and 4)
 my @to_down;
-for (keys %l) {
-    if ($download_link =~ /\d-\d/) {  ## range
-        my ($from) = $download_link =~ /(\d)-/;
-        my ($to) = $download_link =~ /-(\d)/;
-        my $index = $from;
-        for ($from..$to) {
-            push(@to_down, $l{$index});
-            $index++;
-        }
+if ($download_link =~ /\d-\d/) {  ## range
+    my ($from) = $download_link =~ /(\d)-/;
+    my ($to) = $download_link =~ /-(\d)/;
+    my $index = $from;
+    for ($from..$to) {
+        push(@to_down, $l{$index});
+        $index++;
     }
+}
 
-    if ($download_link =~ /\d(,\d)*/) {  ## Comma-separated
-        my @x = split(/,/, $download_link);
-        for (@x) {
-            push(@to_down, $l{$_});
-        }
+if ($download_link =~ /,+/) {  ## Comma-separated
+    my @x = split(/,/, $download_link);
+    for (@x) {
+        push(@to_down, $l{$_});
     }
+}
 
-    if ($download_link =~ /\d{1}/) {  ## Single
-        push(@to_down, $l{$download_link});
-    }
+if ($download_link =~ /\d{1}/) {  ## Single
+    push(@to_down, $l{$download_link});
 }
 
 ## Adding signal handler for INT( Ctrl-C on the keyboard ), and
