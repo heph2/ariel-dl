@@ -16,7 +16,7 @@ let
   };
 
   deps = with perlPackages; [
-    CursesUI
+    CursesUI WWWMechanize MojoDOM58 LWPProtocolHttps
   ];
 
 in
