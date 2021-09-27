@@ -117,8 +117,9 @@ chomp $download_link;
 my @to_down;
 if ($download_link =~ /\d-\d/) {  ## range
     my ($from) = $download_link =~ /(\d)-/;
-    my ($to) = $download_link =~ /-(\d)/;
+    my ($to) = $download_link =~ /-(\d+)/;
     my $index = $from;
+
     for ($from..$to) {
         push(@to_down, $l{$index});
         $index++;
@@ -148,7 +149,7 @@ my @children;
 
 chdir $down_dir; # change directory to down
 #for my $link (@links) {
-for (@to_down) {
+for my $link (@to_down) {
     my $pid = fork;
     if (!defined $pid) {
         warn "failed to fork: $!";
@@ -162,12 +163,12 @@ for (@to_down) {
 
     ## Output use a regexp for extract the name of the file
     ## from the URLs
-    my ($output) = $_ =~ /mp4:(.*\.mp4)/;
+    my ($output) = $link =~ /mp4:(.*\.mp4)/;
     say "Downloading $output on process $pid";
 
     ## Actually call fffmpeg and download the m3u8 file
     #    system("ffmpeg -loglevel panic -i $link -c:v copy -c:a copy -crf 50 $output");
-    system("ffmpeg -loglevel panic -i $_ -c:v copy -c:a copy -crf 50 $output");
+    system("ffmpeg -loglevel panic -i $link -c:v copy -c:a copy -crf 50 $output");
     say "DONE!";
 
     exit;
