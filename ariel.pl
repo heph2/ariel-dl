@@ -4,13 +4,24 @@
 
 ariel-dl Simply download all the video stored in a ariel.unimi.it URL
 
+=head1 SYNOPSIS
+
+  --cred,-c     Credentials of ariel.unimi.it
+  --dir,-d      Download Path
+  --url,-u      URL where videolessons are stored
+  --help,-h     Print this help
+
+=head1 VERSION
+
+0.01
+
 =cut
 
 use strict;
 use warnings;
 use Env;
 use Cwd;
-use Getopt::Long;
+use Getopt::Long 'HelpMessage';
 use WWW::Mechanize;
 use Mojo::DOM58;
 use HTTP::Cookies;
@@ -23,13 +34,12 @@ our $down_dir ||= cwd;
 my $url;
 GetOptions ("cred=s{2}" => \@credentials,
             "dir=s" => \$down_dir,
+            "help"  => sub { HelpMessage(0) },
             "url=s" => \$url)
-    or die("Error in command line arguments\n");
+    or HelpMessage(1);
 
 ## If URL is not passed DIE!
-if (not defined $url) {
-    die "Need URL\n";
-}
+HelpMessage(1) unless $url;
 
 ## Check if credentials are cached
 if (not @credentials) {
@@ -87,9 +97,20 @@ sub fetch_link {
 
     my $dom = Mojo::DOM58->new($output_page);
     my @links = $dom->find('video.lecturec source')->map(attr => 'src')->each;
-    my @room_title = $dom->find('.arielRoomTitle span a[href]')->each;
+    my @room_href = $dom->find('.arielRoomTitle span a[href]')->each;
 
-    say for @room_title;
+    ## Support for fetching In 'Contenuti' and search for SubDirectory
+    # my %room;
+    # for (@room_href) {
+    #     my ($room_link) = $_ =~ /<a href="(.*)">/;
+    #     $url =~ s/ThreadList.aspx\?name=contenuti//;
+
+    #     my $room_url = $url . $room_link;
+    #     my ($room_name) = $_ =~ /">(.*)<\/a>/;
+    #     $room{$room_url} = $room_name;
+
+    #     say $room_url;
+    # }
 
     say "Link Fetched";
 
