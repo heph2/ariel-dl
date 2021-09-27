@@ -2,7 +2,7 @@
 
 =head1 ariel-dl
 
-ariel-dl Simply download all the video stored in a ariel.unimi.it URL
+ariel-dl Simply download videos stored in a ariel.unimi.it URL
 
 =head1 SYNOPSIS
 
@@ -141,7 +141,7 @@ chomp $download_link;
 my @to_down;
 if ($download_link =~ /\d-\d/) {  ## range
     my ($from) = $download_link =~ /(\d)-/;
-    my ($to) = $download_link =~ /-(\d)/;
+    my ($to) = $download_link =~ /-(\d+)/;
     my $index = $from;
     for ($from..$to) {
         push(@to_down, $l{$index});
@@ -160,13 +160,56 @@ if ($download_link =~ /\d{1}/) {  ## Single
     push(@to_down, $l{$download_link});
 }
 
+## Adding signal handler for INT( Ctrl-C on the keyboard ), and
+## for TERM, that cause Perl to exit cleanly
+## If fork fails, parent send a TERM to all child process and then exit
+$SIG{INT} = $SIG{TERM} = sub { exit };
+
+my $parent_pid = "$$";
+## now use the links for execute ffmpeg and download, it will spawn a
+## process for each link and download them "concurrently"
+my @children;
+
 chdir $down_dir; # change directory to down
 
-for (@to_down) {
+for my $link (@to_down) {
+    my $pid = fork;
+    if (!defined $pid) {
+        warn "failed to fork: $!";
+        kill 'TERM', @children;
+        exit;
+    }
+    elsif ($pid) {
+        push @children, $pid;
+        next;
+    }
+
     ## Output use a regexp for extract the name of the file
     ## from the URLs
-    my ($output) = $_ =~ /mp4:(.*\.mp4)/;
+    my ($output) = $link =~ /mp4:(.*\.mp4)/;
+    say "Downloading $output on process $pid";
 
-    system("ffmpeg -loglevel panic -i $_ -c:v copy -c:a copy -crf 50 $output");
-    say "DONE!";
+    system("ffmpeg -loglevel panic -i $link -c:v copy -c:a copy -crf 50 $output");
+
+    exit;
+}
+
+## wait_children performs blocking wait call on the pids forked by the parent
+wait_children();
+
+sub wait_children {
+    while (scalar @children) {
+        my $pid = $children[0];
+        my $kid = waitpid $pid, 0;
+        warn "Reaped $pid ($kid)\n";
+        shift @children;
+    }
+    say "Done!";
+}
+
+## Additional clean up if some zombie process spawned earlier exists
+END {
+    if ($parent_pid == $$) {
+        wait_children();
+    }
 }
