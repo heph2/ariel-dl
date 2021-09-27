@@ -87,7 +87,7 @@ sub fetch_link {
 
     my $dom = Mojo::DOM58->new($output_page);
     my @links = $dom->find('video.lecturec source')->map(attr => 'src')->each;
-    my @room_title = $dom->find('.arielRoomTitle span a')->map(attr => 'textContent')->each;
+    my @room_title = $dom->find('.arielRoomTitle span a[href]')->each;
 
     say for @room_title;
 
