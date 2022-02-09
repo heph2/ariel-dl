@@ -189,7 +189,7 @@ for my $link (@to_down) {
     my ($output) = $link =~ /mp4:(.*\.mp4)/;
     say "Downloading $output on process $pid";
 
-    system("ffmpeg -loglevel panic -i $link -c:v copy -c:a copy -crf 50 $output");
+    system("ffmpeg -loglevel panic -i \"$link\" -c:v copy -c:a copy -crf 50 \"$output\"");
 
     exit;
 }
