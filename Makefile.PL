@@ -9,7 +9,7 @@ WriteMakefile(
   LICENSE          => 'gpl_3',
   MIN_PERL_VERSION => '5.26.0', # Modern::Perl '2018'
   EXE_FILES        => [
-    'ariel.pl',
+    'script/ariel-dl',
   ],
   PREREQ_PM        => {
     'strict'   => 0,
