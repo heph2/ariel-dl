@@ -1,14 +1,14 @@
-package App::Ariel;
+package App::ariel;
 
 our $VERSION = 1.0;
 
 =head1 NAME
 
-App::Ariel - a simple scraper and downloader for ariel
+App::ariel - a simple scraper and downloader for ariel
 
 =head1 DESCRIPTION
 
-This is a stub module, see F<./atlas> for details of the app.
+This is a stub module, see F<script/atlas-dl> for details of the app.
 
 =head1 AUTHOR
 
