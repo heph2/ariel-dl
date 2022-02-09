@@ -99,19 +99,6 @@ sub fetch_link {
     my @links = $dom->find('video.lecturec source')->map(attr => 'src')->each;
     my @room_href = $dom->find('.arielRoomTitle span a[href]')->each;
 
-    ## Support for fetching In 'Contenuti' and search for SubDirectory
-    # my %room;
-    # for (@room_href) {
-    #     my ($room_link) = $_ =~ /<a href="(.*)">/;
-    #     $url =~ s/ThreadList.aspx\?name=contenuti//;
-
-    #     my $room_url = $url . $room_link;
-    #     my ($room_name) = $_ =~ /">(.*)<\/a>/;
-    #     $room{$room_url} = $room_name;
-
-    #     say $room_url;
-    # }
-
     say "Link Fetched";
 
     return @links;
@@ -187,8 +174,13 @@ for my $link (@to_down) {
     ## Output use a regexp for extract the name of the file
     ## from the URLs
     my ($output) = $link =~ /mp4:(.*\.mp4)/;
-    say "Downloading $output on process $pid";
 
+    # Workaround because broken tty
+    # Redirect STDOUT to /dev/null
+    local *STDOUT;
+    open STDOUT, '>/dev/null' or warn "Can't open /dev/null: $!";
+    close STDOUT;
+    
     system("ffmpeg -loglevel panic -i \"$link\" -c:v copy -c:a copy -crf 50 \"$output\"");
 
     exit;
