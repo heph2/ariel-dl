@@ -108,10 +108,10 @@ my @links = fetch_link( $username, $password );
 
 # now we print a table with index and all the link
 my $index = 1;
-my %l;
+my @l;
 for (@links) {
-    $l{$index} = $_;
-    print "$index  | $_\n";
+    $l[$index] = $_;
+    print "$index | $_\n";
     $index++;
 }
 
@@ -131,7 +131,7 @@ if ($download_link =~ /\d-\d/) {  ## range
     my ($to) = $download_link =~ /-(\d+)/;
     my $index = $from;
     for ($from..$to) {
-        push(@to_down, $l{$index});
+	push(@to_down, $l[$index]);
         $index++;
     }
 }
@@ -139,12 +139,14 @@ if ($download_link =~ /\d-\d/) {  ## range
 if ($download_link =~ /,+/) {  ## Comma-separated
     my @x = split(/,/, $download_link);
     for (@x) {
-        push(@to_down, $l{$_});
+	if ((defined $_) and !($_ =~ /^$/ )) {
+	    push(@to_down, $l[$_]);
+	}
     }
 }
 
 if ($download_link =~ /\d{1}/) {  ## Single
-    push(@to_down, $l{$download_link});
+    push(@to_down, $l[$index]);
 }
 
 ## Adding signal handler for INT( Ctrl-C on the keyboard ), and
@@ -173,16 +175,10 @@ for my $link (@to_down) {
 
     ## Output use a regexp for extract the name of the file
     ## from the URLs
-    my ($output) = $link =~ /mp4:(.*\.mp4)/;
-
-    # Workaround because broken tty
-    # Redirect STDOUT to /dev/null
-    local *STDOUT;
-    open STDOUT, '>/dev/null' or warn "Can't open /dev/null: $!";
-    close STDOUT;
-    
-    system("ffmpeg -loglevel panic -i \"$link\" -c:v copy -c:a copy -crf 50 \"$output\"");
-
+    if (defined $link) {
+	my ($output) = $link =~ /mp4:(.*\.mp4)/;
+	system("ffmpeg -loglevel panic -i \"$link\" -c:v copy -c:a copy -crf 50 \"$output\"");
+    }
     exit;
 }
 
