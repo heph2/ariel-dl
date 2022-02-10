@@ -1,0 +1,48 @@
+.Dd February 9, 2022
+.Os
+.Sh NAME
+.Nm ariel-dl
+.Nd UniMi Videolessons downloader
+.Sh SYNOPSIS
+.Nm
+.Bk -words
+.Op Fl -c Ar credentials
+.Op Fl -u Ar url
+.Op Fl -d Ar download path
+.Op Fl -h Ar help menu
+.Ek
+.Sh DESCRIPTION
+.Nm
+.Pq ariel-dl
+download videolessons from ariel.unimi.it
+simply providing an url where lessons are stored using
+.Fl -u
+Usually in "Contenuti".
+Then use the flag
+.Fl -c
+and provide a valid credentials for ariel.unimi.it
+The credentials are stored in
+.Pa $HOME/.cache/ariel-dl/credentials.txt.
+Use again
+.Fl -c for override them.
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl c, Fl -cred
+Specify ariel.unimi.it credentials space separated.
+.It Fl u, Fl -url
+Specify ariel url to fetch videos
+.It Fl d, Fl -dir
+Provide a path where lessons should be downloaded.
+.It Fl h, Fl -help
+Print help menu.
+.El
+.Sh EXAMPLES
+.Bd -literal -offset indent
+$ ariel-dl -c username password -u example.com
+.Sh AUTHORS
+.An -nosplit
+The
+.Nm
+utility was written by
+.An Heph Aq Mt srht@mrkeebs.eu .
